@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}[[ 'Edit' if customer else 'New' ]] customer{% endblock %}
+{% block heading %}[[ 'Edit customer' if customer else 'New customer' ]]{% endblock %}
+{% block content %}
+<div class="panel" style="max-width: 760px;">
+  <form class="form" method="post" action="[[ '/customers/' ~ customer.id ~ '/edit' if customer else '/customers/new' ]]">
+    <div class="form-grid">
+      <label class="field col-span-2">
+        <span>Company name *</span>
+        <input type="text" name="company_name" required value="[[ customer.company_name if customer else '' ]]" />
+      </label>
+      <label class="field">
+        <span>Type</span>
+        <select name="customer_type">
+          {% for t in types %}
+          <option value="[[ t ]]" {% if customer and customer.customer_type == t %}selected{% endif %}>[[ t ]]</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span>Status</span>
+        <select name="status">
+          {% for s in statuses %}
+          <option value="[[ s ]]" {% if customer and customer.status == s %}selected{% endif %}>[[ s ]]</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span>Email</span>
+        <input type="email" name="email" value="[[ customer.email or '' if customer else '' ]]" />
+      </label>
+      <label class="field">
+        <span>Phone</span>
+        <input type="text" name="phone" value="[[ customer.phone or '' if customer else '' ]]" />
+      </label>
+      <label class="field">
+        <span>Website</span>
+        <input type="text" name="website" value="[[ customer.website or '' if customer else '' ]]" />
+      </label>
+      <label class="field">
+        <span>Credit limit</span>
+        <input type="number" step="0.01" name="credit_limit" value="[[ customer.credit_limit if customer else '0' ]]" />
+      </label>
+      <label class="field col-span-2">
+        <span>Address</span>
+        <input type="text" name="address" value="[[ customer.address or '' if customer else '' ]]" />
+      </label>
+      <label class="field">
+        <span>City</span>
+        <input type="text" name="city" value="[[ customer.city or '' if customer else '' ]]" />
+      </label>
+      <label class="field">
+        <span>Country</span>
+        <input type="text" name="country" value="[[ customer.country or '' if customer else '' ]]" />
+      </label>
+      <label class="field col-span-2">
+        <span>Notes</span>
+        <textarea name="notes">[[ customer.notes or '' if customer else '' ]]</textarea>
+      </label>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">[[ 'Save changes' if customer else 'Create customer' ]]</button>
+      <a class="btn" href="[[ '/customers/' ~ customer.id if customer else '/customers' ]]">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

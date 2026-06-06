@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block heading %}Dashboard{% endblock %}
+{% block content %}
+<section class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">Customers</div>
+    <div class="kpi-value">[[ total_customers ]]</div>
+    <a class="kpi-link" href="/customers">View all</a>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Open opportunities</div>
+    <div class="kpi-value">[[ open_leads ]]</div>
+    <a class="kpi-link" href="/leads">View pipeline</a>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Open pipeline value</div>
+    <div class="kpi-value">[[ open_value | money ]]</div>
+    <span class="kpi-sub">Won: [[ won_value | money ]]</span>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Order revenue</div>
+    <div class="kpi-value">[[ order_revenue | money ]]</div>
+    <span class="kpi-sub">[[ total_orders ]] orders &middot; [[ total_products ]] products</span>
+  </div>
+</section>
+
+<div class="grid-2">
+  <section class="panel">
+    <div class="panel-head"><h2>Sales pipeline</h2><a class="btn btn-sm" href="/leads">Open</a></div>
+    <div class="pipeline">
+      {% for stage, data in pipeline.items() %}
+      <div class="pipeline-row">
+        <div class="pipeline-stage">[[ stage ]]</div>
+        <div class="pipeline-bar-track">
+          <div class="pipeline-bar stage-[[ stage|lower ]]" style="width: [[ ((data.count / max_pipeline * 100) if max_pipeline else 0)|round(0, 'floor') ]]%"></div>
+        </div>
+        <div class="pipeline-meta">[[ data.count ]] &middot; [[ data.value | money ]]</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Low stock</h2><a class="btn btn-sm" href="/products">Products</a></div>
+    {% if low_stock %}
+    <table class="table">
+      <thead><tr><th>SKU</th><th>Product</th><th class="right">Stock</th></tr></thead>
+      <tbody>
+        {% for p in low_stock %}
+        <tr>
+          <td><code>[[ p.sku ]]</code></td>
+          <td>[[ p.name ]]</td>
+          <td class="right"><span class="badge badge-warn">[[ p.stock_qty ]]</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="empty">Stock levels look healthy.</p>{% endif %}
+  </section>
+</div>
+
+<div class="grid-2">
+  <section class="panel">
+    <div class="panel-head"><h2>Recent orders</h2><a class="btn btn-sm" href="/orders">All orders</a></div>
+    {% if recent_orders %}
+    <table class="table">
+      <thead><tr><th>Order</th><th>Customer</th><th>Status</th><th class="right">Total</th></tr></thead>
+      <tbody>
+        {% for o in recent_orders %}
+        <tr>
+          <td><a href="/orders/[[ o.id ]]">[[ o.order_number ]]</a></td>
+          <td>[[ o.customer.company_name if o.customer else '—' ]]</td>
+          <td><span class="badge status-[[ o.status|lower ]]">[[ o.status ]]</span></td>
+          <td class="right">[[ o.total_amount | money ]]</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="empty">No orders yet.</p>{% endif %}
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Recent activity</h2><a class="btn btn-sm" href="/activities">All activity</a></div>
+    {% if recent_activities %}
+    <ul class="timeline">
+      {% for a in recent_activities %}
+      <li>
+        <span class="badge badge-soft">[[ a.type ]]</span>
+        <span class="timeline-subject">[[ a.subject ]]</span>
+        {% if a.customer %}<span class="timeline-meta">[[ a.customer.company_name ]]</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}<p class="empty">No activity logged yet.</p>{% endif %}
+  </section>
+</div>
+{% endblock %}

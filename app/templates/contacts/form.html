@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}[[ 'Edit' if contact else 'New' ]] contact{% endblock %}
+{% block heading %}[[ 'Edit contact' if contact else 'New contact' ]]{% endblock %}
+{% block content %}
+<div class="panel" style="max-width: 640px;">
+  <form class="form" method="post" action="[[ '/contacts/' ~ contact.id ~ '/edit' if contact else '/contacts/new' ]]">
+    <label class="field">
+      <span>Company *</span>
+      <select name="customer_id" required>
+        {% for c in customers %}
+        <option value="[[ c.id ]]" {% if preselect_customer == c.id %}selected{% endif %}>[[ c.company_name ]]</option>
+        {% endfor %}
+      </select>
+    </label>
+    <div class="form-grid">
+      <label class="field">
+        <span>First name *</span>
+        <input type="text" name="first_name" required value="[[ contact.first_name if contact else '' ]]" />
+      </label>
+      <label class="field">
+        <span>Last name *</span>
+        <input type="text" name="last_name" required value="[[ contact.last_name if contact else '' ]]" />
+      </label>
+      <label class="field">
+        <span>Title</span>
+        <input type="text" name="title" value="[[ contact.title or '' if contact else '' ]]" />
+      </label>
+      <label class="field">
+        <span>Email</span>
+        <input type="email" name="email" value="[[ contact.email or '' if contact else '' ]]" />
+      </label>
+      <label class="field">
+        <span>Phone</span>
+        <input type="text" name="phone" value="[[ contact.phone or '' if contact else '' ]]" />
+      </label>
+      <label class="field field-inline" style="align-self: end;">
+        <input type="checkbox" name="is_primary" value="true" {% if contact and contact.is_primary %}checked{% endif %} />
+        <span>Primary contact</span>
+      </label>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">[[ 'Save changes' if contact else 'Create contact' ]]</button>
+      <a class="btn" href="/contacts">Cancel</a>
+      {% if contact %}
+      <form class="inline-form" method="post" action="/contacts/[[ contact.id ]]/delete" onsubmit="return confirm('Delete this contact?');">
+        <button class="btn btn-danger" type="submit">Delete</button>
+      </form>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

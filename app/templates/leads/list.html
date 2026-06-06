@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Pipeline{% endblock %}
+{% block heading %}Sales pipeline{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Pipeline</h1>
+  <div class="toolbar">
+    <a class="btn {% if view != 'list' %}btn-primary{% endif %}" href="/leads?view=board">Board</a>
+    <a class="btn {% if view == 'list' %}btn-primary{% endif %}" href="/leads?view=list">List</a>
+    <a class="btn btn-primary" href="/leads/new">+ New opportunity</a>
+  </div>
+</div>
+
+{% if view == 'list' %}
+<div class="table-card">
+  <table class="table">
+    <thead><tr><th>Title</th><th>Customer</th><th>Stage</th><th>Owner</th><th>Close date</th><th class="right">Value</th><th></th></tr></thead>
+    <tbody>
+      {% for l in leads %}
+      <tr>
+        <td><strong>[[ l.title ]]</strong></td>
+        <td>[[ l.customer.company_name if l.customer else '—' ]]</td>
+        <td><span class="badge stage-[[ l.stage|lower ]]">[[ l.stage ]]</span></td>
+        <td>[[ l.owner.full_name if l.owner else '—' ]]</td>
+        <td>[[ l.expected_close_date | date_fmt or '—' ]]</td>
+        <td class="right">[[ l.value | money ]]</td>
+        <td class="right"><a class="btn btn-sm" href="/leads/[[ l.id ]]/edit">Edit</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="empty">No opportunities yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="board">
+  {% for stage in stages %}
+  <div class="board-col">
+    <h3>[[ stage ]]</h3>
+    <div class="board-col-total">[[ board[stage]|length ]] &middot; [[ stage_totals[stage] | money ]]</div>
+    {% for l in board[stage] %}
+    <div class="lead-card">
+      <h4><a href="/leads/[[ l.id ]]/edit">[[ l.title ]]</a></h4>
+      <div class="lead-cust">[[ l.customer.company_name if l.customer else '—' ]]</div>
+      <div class="lead-val">[[ l.value | money ]]</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

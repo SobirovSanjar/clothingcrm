@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Contacts{% endblock %}
+{% block heading %}Contacts{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Contacts</h1>
+  <a class="btn btn-primary" href="/contacts/new">+ New contact</a>
+</div>
+<div class="table-card">
+  <table class="table">
+    <thead><tr><th>Name</th><th>Title</th><th>Company</th><th>Email</th><th>Phone</th><th></th></tr></thead>
+    <tbody>
+      {% for ct in contacts %}
+      <tr>
+        <td><strong>[[ ct.full_name ]]</strong>{% if ct.is_primary %} <span class="badge badge-soft">Primary</span>{% endif %}</td>
+        <td>[[ ct.title or '—' ]]</td>
+        <td><a href="/customers/[[ ct.customer_id ]]">[[ ct.customer.company_name if ct.customer else '—' ]]</a></td>
+        <td>[[ ct.email or '—' ]]</td>
+        <td>[[ ct.phone or '—' ]]</td>
+        <td class="right"><a class="btn btn-sm" href="/contacts/[[ ct.id ]]/edit">Edit</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty">No contacts yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

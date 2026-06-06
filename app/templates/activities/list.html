@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Activities{% endblock %}
+{% block heading %}Activities & tasks{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Activities</h1>
+  <a class="btn btn-primary" href="/activities/new">+ Log activity</a>
+</div>
+<div class="table-card">
+  <table class="table">
+    <thead><tr><th></th><th>Type</th><th>Subject</th><th>Customer</th><th>Due</th><th>Owner</th><th></th></tr></thead>
+    <tbody>
+      {% for a in activities %}
+      <tr>
+        <td>
+          <form class="inline-form" method="post" action="/activities/[[ a.id ]]/toggle">
+            <button class="btn btn-sm" type="submit" title="Toggle complete">[[ '✓' if a.completed else '○' ]]</button>
+          </form>
+        </td>
+        <td><span class="badge badge-soft">[[ a.type ]]</span></td>
+        <td>{% if a.completed %}<s>[[ a.subject ]]</s>{% else %}<strong>[[ a.subject ]]</strong>{% endif %}</td>
+        <td>[[ a.customer.company_name if a.customer else '—' ]]</td>
+        <td>{% if a.due_date %}<span class="badge {% if not a.completed and a.due_date < today %}badge-warn{% endif %}">[[ a.due_date | date_fmt ]]</span>{% else %}—{% endif %}</td>
+        <td>[[ a.owner.full_name if a.owner else '—' ]]</td>
+        <td class="right"><a class="btn btn-sm" href="/activities/[[ a.id ]]/edit">Edit</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="empty">No activities logged yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

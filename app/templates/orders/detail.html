@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}[[ order.order_number ]]{% endblock %}
+{% block heading %}Order [[ order.order_number ]]{% endblock %}
+{% block content %}
+<div class="detail-head">
+  <div class="detail-title">
+    <h1>[[ order.order_number ]]</h1>
+    <div class="detail-sub">
+      <a href="/customers/[[ order.customer_id ]]">[[ order.customer.company_name if order.customer else '—' ]]</a>
+      &middot; [[ order.order_date | date_fmt ]]
+    </div>
+  </div>
+  <div class="toolbar">
+    <form class="inline-form" method="post" action="/orders/[[ order.id ]]/status">
+      <select name="status" onchange="this.form.submit()">
+        {% for s in statuses %}
+        <option value="[[ s ]]" {% if order.status == s %}selected{% endif %}>[[ s ]]</option>
+        {% endfor %}
+      </select>
+    </form>
+    <form class="inline-form" method="post" action="/orders/[[ order.id ]]/delete" onsubmit="return confirm('Delete this order?');">
+      <button class="btn btn-danger" type="submit">Delete</button>
+    </form>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="panel-head"><h2>Line items</h2><span class="badge status-[[ order.status|lower ]]">[[ order.status ]]</span></div>
+  <table class="table">
+    <thead><tr><th>Product</th><th>SKU</th><th class="right">Unit price</th><th class="right">Qty</th><th class="right">Line total</th><th></th></tr></thead>
+    <tbody>
+      {% for item in order.items %}
+      <tr>
+        <td>[[ item.product.name if item.product else '—' ]]</td>
+        <td><code>[[ item.product.sku if item.product else '' ]]</code></td>
+        <td class="right">[[ item.unit_price | money ]]</td>
+        <td class="right">[[ item.quantity ]]</td>
+        <td class="right">[[ item.line_total | money ]]</td>
+        <td class="right">
+          <form class="inline-form" method="post" action="/orders/[[ order.id ]]/items/[[ item.id ]]/delete">
+            <button class="btn btn-sm btn-danger" type="submit">Remove</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty">No items on this order yet.</td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr><td colspan="4" class="right"><strong>Total</strong></td><td class="right"><strong>[[ order.total_amount | money ]]</strong></td><td></td></tr>
+    </tfoot>
+  </table>
+</section>
+
+<section class="panel" style="max-width: 640px;">
+  <div class="panel-head"><h2>Add item</h2></div>
+  <form class="form" method="post" action="/orders/[[ order.id ]]/items/add">
+    <div class="form-grid">
+      <label class="field col-span-2">
+        <span>Product</span>
+        <select name="product_id" required>
+          {% for p in products %}
+          <option value="[[ p.id ]]">[[ p.name ]] — [[ p.unit_price | money ]] ([[ p.stock_qty ]] in stock)</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span>Quantity</span>
+        <input type="number" name="quantity" value="1" min="1" />
+      </label>
+      <div class="field" style="justify-content: end;">
+        <button type="submit" class="btn btn-primary">Add to order</button>
+      </div>
+    </div>
+  </form>
+</section>
+{% if order.notes %}
+<section class="panel"><div class="panel-head"><h2>Notes</h2></div><p>[[ order.notes ]]</p></section>
+{% endif %}
+{% endblock %}

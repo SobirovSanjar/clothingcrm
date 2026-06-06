@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}[[ 'Edit' if activity else 'New' ]] activity{% endblock %}
+{% block heading %}[[ 'Edit activity' if activity else 'Log activity' ]]{% endblock %}
+{% block content %}
+<div class="panel" style="max-width: 680px;">
+  <form class="form" method="post" action="[[ '/activities/' ~ activity.id ~ '/edit' if activity else '/activities/new' ]]">
+    <div class="form-grid">
+      <label class="field">
+        <span>Type</span>
+        <select name="type">
+          {% for t in types %}
+          <option value="[[ t ]]" {% if activity and activity.type == t %}selected{% endif %}>[[ t ]]</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span>Customer</span>
+        <select name="customer_id">
+          <option value="">— None —</option>
+          {% for c in customers %}
+          <option value="[[ c.id ]]" {% if preselect_customer == c.id %}selected{% endif %}>[[ c.company_name ]]</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field col-span-2">
+        <span>Subject *</span>
+        <input type="text" name="subject" required value="[[ activity.subject if activity else '' ]]" />
+      </label>
+      <label class="field">
+        <span>Due date</span>
+        <input type="date" name="due_date" value="[[ activity.due_date | date_input if activity else '' ]]" />
+      </label>
+      <label class="field field-inline" style="align-self: end;">
+        <input type="checkbox" name="completed" value="true" {% if activity and activity.completed %}checked{% endif %} />
+        <span>Completed</span>
+      </label>
+      <label class="field col-span-2">
+        <span>Description</span>
+        <textarea name="description">[[ activity.description or '' if activity else '' ]]</textarea>
+      </label>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">[[ 'Save changes' if activity else 'Log activity' ]]</button>
+      <a class="btn" href="/activities">Cancel</a>
+      {% if activity %}
+      <form class="inline-form" method="post" action="/activities/[[ activity.id ]]/delete" onsubmit="return confirm('Delete this activity?');">
+        <button class="btn btn-danger" type="submit">Delete</button>
+      </form>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

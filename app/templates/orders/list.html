@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Orders{% endblock %}
+{% block heading %}Orders{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Orders</h1>
+  <a class="btn btn-primary" href="/orders/new">+ New order</a>
+</div>
+<div class="table-card">
+  <table class="table">
+    <thead><tr><th>Order #</th><th>Customer</th><th>Date</th><th>Status</th><th class="right">Total</th></tr></thead>
+    <tbody>
+      {% for o in orders %}
+      <tr>
+        <td><a href="/orders/[[ o.id ]]"><strong>[[ o.order_number ]]</strong></a></td>
+        <td>[[ o.customer.company_name if o.customer else '—' ]]</td>
+        <td>[[ o.order_date | date_fmt ]]</td>
+        <td><span class="badge status-[[ o.status|lower ]]">[[ o.status ]]</span></td>
+        <td class="right">[[ o.total_amount | money ]]</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="empty">No orders yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

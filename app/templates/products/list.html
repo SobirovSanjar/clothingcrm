@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+{% block heading %}Product catalogue{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Products</h1>
+  <div class="toolbar">
+    <form class="search" method="get" action="/products">
+      <input type="text" name="q" value="[[ q ]]" placeholder="Search name, SKU, category…" />
+      <button class="btn" type="submit">Search</button>
+    </form>
+    <a class="btn btn-primary" href="/products/new">+ New product</a>
+  </div>
+</div>
+<div class="table-card">
+  <table class="table">
+    <thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Size</th><th>Color</th><th class="right">Price</th><th class="right">Stock</th><th></th></tr></thead>
+    <tbody>
+      {% for p in products %}
+      <tr>
+        <td><code>[[ p.sku ]]</code></td>
+        <td><strong>[[ p.name ]]</strong></td>
+        <td>[[ p.category ]]</td>
+        <td>[[ p.size or '—' ]]</td>
+        <td>[[ p.color or '—' ]]</td>
+        <td class="right">[[ p.unit_price | money ]]</td>
+        <td class="right">{% if p.stock_qty < 25 %}<span class="badge badge-warn">[[ p.stock_qty ]]</span>{% else %}[[ p.stock_qty ]]{% endif %}</td>
+        <td class="right"><a class="btn btn-sm" href="/products/[[ p.id ]]/edit">Edit</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" class="empty">No products yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

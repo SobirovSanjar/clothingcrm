@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}[[ customer.company_name ]]{% endblock %}
+{% block heading %}Customer{% endblock %}
+{% block content %}
+<div class="detail-head">
+  <div class="detail-title">
+    <h1>[[ customer.company_name ]]</h1>
+    <div class="detail-sub">
+      <span class="badge status-[[ customer.status|lower ]]">[[ customer.status ]]</span>
+      &middot; [[ customer.customer_type ]]
+      {% if customer.city or customer.country %}&middot; [[ [customer.city, customer.country] | select | join(', ') ]]{% endif %}
+    </div>
+  </div>
+  <div class="toolbar">
+    <a class="btn" href="/customers/[[ customer.id ]]/edit">Edit</a>
+    <form class="inline-form" method="post" action="/customers/[[ customer.id ]]/delete" onsubmit="return confirm('Delete this customer and all related records?');">
+      <button class="btn btn-danger" type="submit">Delete</button>
+    </form>
+  </div>
+</div>
+
+<div class="grid-2">
+  <section class="panel">
+    <div class="panel-head"><h2>Details</h2></div>
+    <dl class="def-list">
+      <dt>Email</dt><dd>[[ customer.email or '—' ]]</dd>
+      <dt>Phone</dt><dd>[[ customer.phone or '—' ]]</dd>
+      <dt>Website</dt><dd>[[ customer.website or '—' ]]</dd>
+      <dt>Address</dt><dd>[[ customer.address or '—' ]]</dd>
+      <dt>Owner</dt><dd>[[ customer.owner.full_name if customer.owner else '—' ]]</dd>
+      <dt>Credit limit</dt><dd>[[ customer.credit_limit | money ]]</dd>
+      <dt>Notes</dt><dd>[[ customer.notes or '—' ]]</dd>
+    </dl>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Contacts</h2><a class="btn btn-sm" href="/contacts/new?customer_id=[[ customer.id ]]">+ Add</a></div>
+    {% if customer.contacts %}
+    <table class="table">
+      <tbody>
+        {% for ct in customer.contacts %}
+        <tr>
+          <td><strong>[[ ct.full_name ]]</strong>{% if ct.is_primary %} <span class="badge badge-soft">Primary</span>{% endif %}<br><span class="detail-sub">[[ ct.title or '' ]]</span></td>
+          <td>[[ ct.email or '—' ]]<br>[[ ct.phone or '' ]]</td>
+          <td class="right"><a class="btn btn-sm" href="/contacts/[[ ct.id ]]/edit">Edit</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="empty">No contacts yet.</p>{% endif %}
+  </section>
+</div>
+
+<div class="grid-2">
+  <section class="panel">
+    <div class="panel-head"><h2>Opportunities</h2><a class="btn btn-sm" href="/leads/new?customer_id=[[ customer.id ]]">+ Add</a></div>
+    {% if customer.leads %}
+    <table class="table">
+      <thead><tr><th>Title</th><th>Stage</th><th class="right">Value</th></tr></thead>
+      <tbody>
+        {% for l in customer.leads %}
+        <tr>
+          <td>[[ l.title ]]</td>
+          <td><span class="badge stage-[[ l.stage|lower ]]">[[ l.stage ]]</span></td>
+          <td class="right">[[ l.value | money ]]</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="empty">No opportunities yet.</p>{% endif %}
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Orders</h2><a class="btn btn-sm" href="/orders/new?customer_id=[[ customer.id ]]">+ Add</a></div>
+    {% if customer.orders %}
+    <table class="table">
+      <thead><tr><th>Order</th><th>Status</th><th class="right">Total</th></tr></thead>
+      <tbody>
+        {% for o in customer.orders %}
+        <tr>
+          <td><a href="/orders/[[ o.id ]]">[[ o.order_number ]]</a></td>
+          <td><span class="badge status-[[ o.status|lower ]]">[[ o.status ]]</span></td>
+          <td class="right">[[ o.total_amount | money ]]</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="empty">No orders yet.</p>{% endif %}
+  </section>
+</div>
+
+<section class="panel">
+  <div class="panel-head"><h2>Activity</h2><a class="btn btn-sm" href="/activities/new?customer_id=[[ customer.id ]]">+ Log activity</a></div>
+  {% if customer.activities %}
+  <ul class="timeline">
+    {% for a in customer.activities %}
+    <li>
+      <span class="badge badge-soft">[[ a.type ]]</span>
+      <span class="timeline-subject">[[ a.subject ]]</span>
+      {% if a.due_date %}<span class="timeline-meta">Due [[ a.due_date | date_fmt ]]</span>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}<p class="empty">No activity logged yet.</p>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}New order{% endblock %}
+{% block heading %}New order{% endblock %}
+{% block content %}
+<div class="panel" style="max-width: 640px;">
+  <form class="form" method="post" action="/orders/new">
+    <label class="field">
+      <span>Customer *</span>
+      <select name="customer_id" required>
+        {% for c in customers %}
+        <option value="[[ c.id ]]" {% if preselect_customer == c.id %}selected{% endif %}>[[ c.company_name ]]</option>
+        {% endfor %}
+      </select>
+    </label>
+    <div class="form-grid">
+      <label class="field">
+        <span>Status</span>
+        <select name="status">
+          {% for s in statuses %}
+          <option value="[[ s ]]">[[ s ]]</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span>Order date</span>
+        <input type="date" name="order_date" />
+      </label>
+    </div>
+    <label class="field">
+      <span>Notes</span>
+      <textarea name="notes"></textarea>
+    </label>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Create order</button>
+      <a class="btn" href="/orders">Cancel</a>
+    </div>
+    <p class="detail-sub">You can add line items after the order is created.</p>
+  </form>
+</div>
+{% endblock %}

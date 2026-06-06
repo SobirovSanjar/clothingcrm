@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}[[ 'Edit' if lead else 'New' ]] opportunity{% endblock %}
+{% block heading %}[[ 'Edit opportunity' if lead else 'New opportunity' ]]{% endblock %}
+{% block content %}
+<div class="panel" style="max-width: 720px;">
+  <form class="form" method="post" action="[[ '/leads/' ~ lead.id ~ '/edit' if lead else '/leads/new' ]]">
+    <label class="field">
+      <span>Title *</span>
+      <input type="text" name="title" required value="[[ lead.title if lead else '' ]]" />
+    </label>
+    <div class="form-grid">
+      <label class="field">
+        <span>Customer</span>
+        <select name="customer_id">
+          <option value="">— None —</option>
+          {% for c in customers %}
+          <option value="[[ c.id ]]" {% if preselect_customer == c.id %}selected{% endif %}>[[ c.company_name ]]</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span>Stage</span>
+        <select name="stage">
+          {% for s in stages %}
+          <option value="[[ s ]]" {% if lead and lead.stage == s %}selected{% endif %}>[[ s ]]</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span>Value</span>
+        <input type="number" step="0.01" name="value" value="[[ lead.value if lead else '0' ]]" />
+      </label>
+      <label class="field">
+        <span>Probability (%)</span>
+        <input type="number" name="probability" min="0" max="100" value="[[ lead.probability if lead else '10' ]]" />
+      </label>
+      <label class="field">
+        <span>Source</span>
+        <input type="text" name="source" value="[[ lead.source or '' if lead else '' ]]" />
+      </label>
+      <label class="field">
+        <span>Expected close date</span>
+        <input type="date" name="expected_close_date" value="[[ lead.expected_close_date | date_input if lead else '' ]]" />
+      </label>
+      <label class="field col-span-2">
+        <span>Notes</span>
+        <textarea name="notes">[[ lead.notes or '' if lead else '' ]]</textarea>
+      </label>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">[[ 'Save changes' if lead else 'Create opportunity' ]]</button>
+      <a class="btn" href="/leads">Cancel</a>
+      {% if lead %}
+      <form class="inline-form" method="post" action="/leads/[[ lead.id ]]/delete" onsubmit="return confirm('Delete this opportunity?');">
+        <button class="btn btn-danger" type="submit">Delete</button>
+      </form>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}
