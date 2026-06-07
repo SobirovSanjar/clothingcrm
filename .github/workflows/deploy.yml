@@ -1,49 +1,39 @@
 name: Test and Deploy
 
-# Trigger on push to main branch
 on:
   push:
     branches:
       - main
 
 jobs:
-  # Job 1: Test - Verify the app can be built and imports correctly
   test:
     runs-on: ubuntu-latest
     steps:
-      # Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Set up Python 3.12 environment
       - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
-      # Install Python dependencies from requirements.txt
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # Run smoke test - verify the app module imports successfully
       - name: Run smoke test
         run: python -c "import app.main; print('✓ App imports successfully')"
 
-  # Job 2: Deploy - Only runs after test job passes
   deploy:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      # Use appleboy/ssh-action to SSH into the DigitalOcean Droplet
       - name: Deploy to DigitalOcean Droplet
         uses: appleboy/ssh-action@v1.0.3
         with:
-          # SSH connection details from GitHub secrets
           host: ${{ secrets.DROPLET_IP }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           
-          # Deploy commands to run on the Droplet
           script: |
             cd ~/clothingcrm
             git pull origin main
